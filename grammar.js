@@ -2,7 +2,8 @@ module.exports = grammar({
   name: "TODO",
 
   externals: $ => [
-    $.todo,
+    $.todo_token,
+    $.todo_body,
     $._text
   ],
 
@@ -12,5 +13,7 @@ module.exports = grammar({
 
   rules: {
     program: $ => repeat(choice($.todo, $._text)),
+
+    todo: $ => seq($.todo_token, ':', $.todo_body)
   }
 })

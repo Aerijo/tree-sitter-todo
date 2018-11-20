@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <map>
+#include <set>
 #include <vector>
 #include <string>
 #include <cwctype>
@@ -13,14 +14,33 @@ namespace {
 
 using std::vector;
 using std::string;
-using std::map;
 
 enum TokenType {
-  TODO,
+  TODO_TOKEN,
+  TODO_BODY,
   TEXT
 };
 
 struct Scanner {
+
+  std::set<string> todo_names = {
+    "TODO",
+    "FIXME",
+    "CHANGED",
+    "XXX",
+    "IDEA",
+    "HACK",
+    "NOTE",
+    "REVIEW",
+    "NB",
+    "BUG",
+    "QUESTION",
+    "COMBAK",
+    "TEMP",
+    "DEBUG",
+    "OPTIMIZE",
+    "WARNING"
+  };
 
   Scanner() {}
 
@@ -40,7 +60,16 @@ struct Scanner {
         name += lexer->lookahead;
         lexer->advance(lexer, false);
       } else if (lexer->lookahead == ':') {
-        break;
+        lexer->mark_end(lexer);
+
+        if (todo_names.find(name) != todo_names.end()) {
+          lexer->result_symbol = TODO_TOKEN;
+        } else {
+          lexer->result_symbol = TEXT;
+        }
+
+        return true;
+
       } else {
         lexer->advance(lexer, true);
         lexer->mark_end(lexer);
@@ -49,15 +78,26 @@ struct Scanner {
       }
     }
 
-    while (lexer->lookahead && lexer->lookahead != '\n') lexer->advance(lexer, false);
+    return false;
+  }
+
+  bool scan_todo_body(TSLexer *lexer) {
+    while (lexer->lookahead && lexer->lookahead != '\n') {
+      lexer->advance(lexer, false);
+    }
 
     lexer->mark_end(lexer);
-    lexer->result_symbol = TODO;
+    lexer->result_symbol = TODO_BODY;
     return true;
   }
 
   bool scan_text(TSLexer *lexer) {
-    while (lexer->lookahead && !isupper(lexer->lookahead)) {
+    bool last_was_space = false;
+
+    while (lexer->lookahead) {
+      if (last_was_space && isupper(lexer->lookahead)) break;
+
+      last_was_space = isspace(lexer->lookahead);
       lexer->advance(lexer, true);
     }
 
@@ -70,15 +110,17 @@ struct Scanner {
   {
     if (!lexer->lookahead) return false;
 
-    if (valid_symbols[TODO] && valid_symbols[TEXT] && isupper(lexer->lookahead)) {
+    if (valid_symbols[TODO_BODY]) {
+      return scan_todo_body(lexer);
+    }
+
+    if (valid_symbols[TODO_TOKEN] && valid_symbols[TEXT] && isupper(lexer->lookahead)) {
       return scan_todo(lexer, valid_symbols);
-    } else if (valid_symbols[TODO] && valid_symbols[TEXT]) {
+    } else if (valid_symbols[TODO_TOKEN] && valid_symbols[TEXT]) {
       return scan_text(lexer);
     } else {
       lexer->advance(lexer, true);
-      lexer->mark_end(lexer);
-      lexer->result_symbol = TEXT;
-      return true;
+      return scan_text(lexer);
     }
   }
 

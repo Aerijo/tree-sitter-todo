@@ -16,6 +16,23 @@
           }
         ]
       }
+    },
+    "todo": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "todo_token"
+        },
+        {
+          "type": "STRING",
+          "value": ":"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "todo_body"
+        }
+      ]
     }
   },
   "extras": [
@@ -28,7 +45,11 @@
   "externals": [
     {
       "type": "SYMBOL",
-      "name": "todo"
+      "name": "todo_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "todo_body"
     },
     {
       "type": "SYMBOL",

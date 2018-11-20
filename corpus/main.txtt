@@ -13,7 +13,7 @@ Simple TODO
 TODO: Fix this
 -----
 
-(program (todo))
+(program (todo (todo_token) (todo_body)))
 
 
 =====
@@ -22,27 +22,36 @@ Multiple TODO
 TODO: Fix this
 TODO: And this
 TODO: And this
-TODO: And this
 -----
 
 (program
-  (todo)
-  (todo)
-  (todo)
-  (todo))
+  (todo (todo_token) (todo_body))
+  (todo (todo_token) (todo_body))
+  (todo (todo_token) (todo_body)))
 
 
 =====
-Non start of line TODO
+Not TODO
 =====
-There is still stuff here TODO: Fix this
-TODO: And this
-TODO: And this
-TODO: And this
+helloTODO: this
 -----
 
-(program
-  (todo)
-  (todo)
-  (todo)
-  (todo))
+(program)
+
+
+=====
+Also not TODO
+=====
+hello FOO: this
+-----
+
+(program)
+
+
+=====
+Is TODO
+=====
+hello TODO: this
+-----
+
+(program (todo (todo_token) (todo_body)))

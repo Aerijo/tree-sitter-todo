@@ -4,11 +4,11 @@
   "version": "0.0.0",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/Aerijo/tree-sitter-todo"
   },
   "keywords": [],
   "license": "MIT",
-  "name": "",
+  "name": "tree-sitter-todo",
   "dependencies": {
     "nan": "^2.11.1"
   },
