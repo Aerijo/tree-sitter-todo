@@ -21,7 +21,10 @@ enum TokenType {
 struct Scanner {
 
   bool ignore_case = false;
-  bool get_entire_line = false;
+  bool get_entire_line = true;
+
+  bool require_delim = false; // TODO: support this
+  char delim_character = '\0';
 
   std::set<string> todo_names = {
     "TODO",
@@ -43,7 +46,7 @@ struct Scanner {
   };
 
   Scanner() {
-    // TODO: Add user defined words here
+    // TODO: Add user defined words and settings here
   }
 
   unsigned serialize(char *buffer) {

@@ -72,4 +72,4 @@ Same line TODO
 foo TODO this TODO That
 -----
 
-(program (todo (todo_token)))
+(program (todo (todo_token) (todo_body)))
