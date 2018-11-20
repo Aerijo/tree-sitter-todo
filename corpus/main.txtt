@@ -1,7 +1,7 @@
 =====
 No TODO
 =====
-none
+None
 -----
 
 (program)
@@ -55,3 +55,21 @@ hello TODO: this
 -----
 
 (program (todo (todo_token) (todo_body)))
+
+
+=====
+Ends with TODO
+=====
+foo TODO
+-----
+
+(program (todo (todo_token)))
+
+
+=====
+Same line TODO
+=====
+foo TODO this TODO That
+-----
+
+(program (todo (todo_token)))

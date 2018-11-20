@@ -14,6 +14,6 @@ module.exports = grammar({
   rules: {
     program: $ => repeat(choice($.todo, $._text)),
 
-    todo: $ => seq($.todo_token, ':', $.todo_body)
+    todo: $ => seq($.todo_token, optional($.todo_body))
   }
 })

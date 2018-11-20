@@ -6,10 +6,10 @@
 #endif
 
 #define LANGUAGE_VERSION 9
-#define STATE_COUNT 8
-#define SYMBOL_COUNT 8
+#define STATE_COUNT 7
+#define SYMBOL_COUNT 7
 #define ALIAS_COUNT 0
-#define TOKEN_COUNT 5
+#define TOKEN_COUNT 4
 #define EXTERNAL_TOKEN_COUNT 3
 #define MAX_ALIAS_SEQUENCE_LENGTH 0
 
@@ -17,10 +17,9 @@ enum {
   sym_todo_token = 1,
   sym_todo_body = 2,
   sym__text = 3,
-  anon_sym_COLON = 4,
-  sym_program = 5,
-  sym_todo = 6,
-  aux_sym_program_repeat1 = 7,
+  sym_program = 4,
+  sym_todo = 5,
+  aux_sym_program_repeat1 = 6,
 };
 
 static const char *ts_symbol_names[] = {
@@ -28,7 +27,6 @@ static const char *ts_symbol_names[] = {
   [sym_todo_body] = "todo_body",
   [sym__text] = "_text",
   [ts_builtin_sym_end] = "END",
-  [anon_sym_COLON] = ":",
   [sym_program] = "program",
   [sym_todo] = "todo",
   [aux_sym_program_repeat1] = "program_repeat1",
@@ -51,10 +49,6 @@ static const TSSymbolMetadata ts_symbol_metadata[] = {
     .visible = false,
     .named = true,
   },
-  [anon_sym_COLON] = {
-    .visible = true,
-    .named = false,
-  },
   [sym_program] = {
     .visible = true,
     .named = true,
@@ -75,22 +69,11 @@ static bool ts_lex(TSLexer *lexer, TSStateId state) {
     case 0:
       if (lookahead == 0)
         ADVANCE(1);
-      if (lookahead == ':')
-        ADVANCE(2);
       if ((lookahead < 'A' || lookahead > 'Z'))
         SKIP(0);
       END_STATE();
     case 1:
       ACCEPT_TOKEN(ts_builtin_sym_end);
-      END_STATE();
-    case 2:
-      ACCEPT_TOKEN(anon_sym_COLON);
-      END_STATE();
-    case 3:
-      if (lookahead == 0)
-        ADVANCE(1);
-      if ((lookahead < 'A' || lookahead > 'Z'))
-        SKIP(3);
       END_STATE();
     default:
       return false;
@@ -99,13 +82,12 @@ static bool ts_lex(TSLexer *lexer, TSStateId state) {
 
 static TSLexMode ts_lex_modes[STATE_COUNT] = {
   [0] = {.lex_state = 0, .external_lex_state = 1},
-  [1] = {.lex_state = 3, .external_lex_state = 2},
-  [2] = {.lex_state = 0},
-  [3] = {.lex_state = 3},
-  [4] = {.lex_state = 3, .external_lex_state = 2},
-  [5] = {.lex_state = 3, .external_lex_state = 3},
-  [6] = {.lex_state = 3, .external_lex_state = 2},
-  [7] = {.lex_state = 3, .external_lex_state = 2},
+  [1] = {.lex_state = 0, .external_lex_state = 2},
+  [2] = {.lex_state = 0, .external_lex_state = 1},
+  [3] = {.lex_state = 0},
+  [4] = {.lex_state = 0, .external_lex_state = 2},
+  [5] = {.lex_state = 0, .external_lex_state = 2},
+  [6] = {.lex_state = 0, .external_lex_state = 2},
 };
 
 enum {
@@ -120,7 +102,7 @@ static TSSymbol ts_external_scanner_symbol_map[EXTERNAL_TOKEN_COUNT] = {
   [ts_external_token__text] = sym__text,
 };
 
-static bool ts_external_scanner_states[4][EXTERNAL_TOKEN_COUNT] = {
+static bool ts_external_scanner_states[3][EXTERNAL_TOKEN_COUNT] = {
   [1] = {
     [ts_external_token_todo_token] = true,
     [ts_external_token_todo_body] = true,
@@ -130,9 +112,6 @@ static bool ts_external_scanner_states[4][EXTERNAL_TOKEN_COUNT] = {
     [ts_external_token_todo_token] = true,
     [ts_external_token__text] = true,
   },
-  [3] = {
-    [ts_external_token_todo_body] = true,
-  },
 };
 
 static uint16_t ts_parse_table[STATE_COUNT][SYMBOL_COUNT] = {
@@ -141,7 +120,6 @@ static uint16_t ts_parse_table[STATE_COUNT][SYMBOL_COUNT] = {
     [sym_todo_body] = ACTIONS(1),
     [sym__text] = ACTIONS(1),
     [ts_builtin_sym_end] = ACTIONS(1),
-    [anon_sym_COLON] = ACTIONS(1),
   },
   [1] = {
     [sym_program] = STATE(3),
@@ -152,31 +130,31 @@ static uint16_t ts_parse_table[STATE_COUNT][SYMBOL_COUNT] = {
     [ts_builtin_sym_end] = ACTIONS(7),
   },
   [2] = {
-    [anon_sym_COLON] = ACTIONS(9),
+    [sym_todo_token] = ACTIONS(9),
+    [sym_todo_body] = ACTIONS(11),
+    [sym__text] = ACTIONS(9),
+    [ts_builtin_sym_end] = ACTIONS(9),
   },
   [3] = {
-    [ts_builtin_sym_end] = ACTIONS(11),
+    [ts_builtin_sym_end] = ACTIONS(13),
   },
   [4] = {
     [sym_todo] = STATE(6),
     [aux_sym_program_repeat1] = STATE(6),
     [sym_todo_token] = ACTIONS(3),
-    [sym__text] = ACTIONS(13),
-    [ts_builtin_sym_end] = ACTIONS(15),
+    [sym__text] = ACTIONS(15),
+    [ts_builtin_sym_end] = ACTIONS(17),
   },
   [5] = {
-    [sym_todo_body] = ACTIONS(17),
+    [sym_todo_token] = ACTIONS(19),
+    [sym__text] = ACTIONS(19),
+    [ts_builtin_sym_end] = ACTIONS(19),
   },
   [6] = {
     [sym_todo] = STATE(6),
     [aux_sym_program_repeat1] = STATE(6),
-    [sym_todo_token] = ACTIONS(19),
-    [sym__text] = ACTIONS(22),
-    [ts_builtin_sym_end] = ACTIONS(25),
-  },
-  [7] = {
-    [sym_todo_token] = ACTIONS(27),
-    [sym__text] = ACTIONS(27),
+    [sym_todo_token] = ACTIONS(21),
+    [sym__text] = ACTIONS(24),
     [ts_builtin_sym_end] = ACTIONS(27),
   },
 };
@@ -187,15 +165,15 @@ static TSParseActionEntry ts_parse_actions[] = {
   [3] = {.count = 1, .reusable = true}, SHIFT(2),
   [5] = {.count = 1, .reusable = true}, SHIFT(4),
   [7] = {.count = 1, .reusable = true}, REDUCE(sym_program, 0),
-  [9] = {.count = 1, .reusable = true}, SHIFT(5),
-  [11] = {.count = 1, .reusable = true}, ACCEPT_INPUT(),
-  [13] = {.count = 1, .reusable = true}, SHIFT(6),
-  [15] = {.count = 1, .reusable = true}, REDUCE(sym_program, 1),
-  [17] = {.count = 1, .reusable = true}, SHIFT(7),
-  [19] = {.count = 2, .reusable = true}, REDUCE(aux_sym_program_repeat1, 2), SHIFT_REPEAT(2),
-  [22] = {.count = 2, .reusable = true}, REDUCE(aux_sym_program_repeat1, 2), SHIFT_REPEAT(6),
-  [25] = {.count = 1, .reusable = true}, REDUCE(aux_sym_program_repeat1, 2),
-  [27] = {.count = 1, .reusable = true}, REDUCE(sym_todo, 3),
+  [9] = {.count = 1, .reusable = true}, REDUCE(sym_todo, 1),
+  [11] = {.count = 1, .reusable = true}, SHIFT(5),
+  [13] = {.count = 1, .reusable = true}, ACCEPT_INPUT(),
+  [15] = {.count = 1, .reusable = true}, SHIFT(6),
+  [17] = {.count = 1, .reusable = true}, REDUCE(sym_program, 1),
+  [19] = {.count = 1, .reusable = true}, REDUCE(sym_todo, 2),
+  [21] = {.count = 2, .reusable = true}, REDUCE(aux_sym_program_repeat1, 2), SHIFT_REPEAT(2),
+  [24] = {.count = 2, .reusable = true}, REDUCE(aux_sym_program_repeat1, 2), SHIFT_REPEAT(6),
+  [27] = {.count = 1, .reusable = true}, REDUCE(aux_sym_program_repeat1, 2),
 };
 
 void *tree_sitter_TODO_external_scanner_create();

@@ -1,18 +1,15 @@
 #include <algorithm>
-#include <map>
 #include <set>
 #include <vector>
 #include <string>
 #include <cwctype>
 #include <cstring>
-#include <iostream>
 
 #include "tree_sitter/parser.h"
 
 
 namespace {
 
-using std::vector;
 using std::string;
 
 enum TokenType {
@@ -22,6 +19,9 @@ enum TokenType {
 };
 
 struct Scanner {
+
+  bool ignore_case = false;
+  bool get_entire_line = false;
 
   std::set<string> todo_names = {
     "TODO",
@@ -42,7 +42,9 @@ struct Scanner {
     "WARNING"
   };
 
-  Scanner() {}
+  Scanner() {
+    // TODO: Add user defined words here
+  }
 
   unsigned serialize(char *buffer) {
     return 0;
@@ -59,26 +61,30 @@ struct Scanner {
       if (isupper(lexer->lookahead)) {
         name += lexer->lookahead;
         lexer->advance(lexer, false);
-      } else if (lexer->lookahead == ':') {
-        lexer->mark_end(lexer);
-
-        if (todo_names.find(name) != todo_names.end()) {
-          lexer->result_symbol = TODO_TOKEN;
+      } else if (islower(lexer->lookahead)) {
+        if (ignore_case) {
+          name += toupper(lexer->lookahead);
+          lexer->advance(lexer, false);
         } else {
+          lexer->advance(lexer, true);
+          lexer->mark_end(lexer);
           lexer->result_symbol = TEXT;
+          return true;
         }
-
-        return true;
-
       } else {
-        lexer->advance(lexer, true);
-        lexer->mark_end(lexer);
-        lexer->result_symbol = TEXT;
-        return true;
+        break;
       }
     }
 
-    return false;
+    lexer->mark_end(lexer);
+
+    if (todo_names.find(name) != todo_names.end()) {
+      lexer->result_symbol = TODO_TOKEN;
+    } else {
+      lexer->result_symbol = TEXT;
+    }
+
+    return true;
   }
 
   bool scan_todo_body(TSLexer *lexer) {
@@ -110,7 +116,7 @@ struct Scanner {
   {
     if (!lexer->lookahead) return false;
 
-    if (valid_symbols[TODO_BODY]) {
+    if (valid_symbols[TODO_BODY] && get_entire_line) {
       return scan_todo_body(lexer);
     }
 
@@ -120,7 +126,9 @@ struct Scanner {
       return scan_text(lexer);
     } else {
       lexer->advance(lexer, true);
-      return scan_text(lexer);
+      lexer->mark_end(lexer);
+      lexer->result_symbol = TEXT;
+      return true;
     }
   }
 
