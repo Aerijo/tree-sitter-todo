@@ -4,6 +4,7 @@
 #include <string>
 #include <cwctype>
 #include <cstring>
+#include <iostream>
 
 #include "tree_sitter/parser.h"
 
@@ -68,6 +69,7 @@ struct Scanner {
     string name;
 
     while (lexer->lookahead) {
+
       if (isupper(lexer->lookahead)) {
         name += lexer->lookahead;
         lexer->advance(lexer, false);
@@ -135,13 +137,11 @@ struct Scanner {
       return scan_todo_body(lexer);
     }
 
-    if (valid_symbols[TODO_TOKEN] && valid_symbols[TEXT] && isupper(lexer->lookahead)) {
+    if (isupper(lexer->lookahead)) {
       return scan_todo(lexer, valid_symbols);
-    } else if (valid_symbols[TODO_TOKEN] && valid_symbols[TEXT]) {
-      return scan_text(lexer);
-    } else {
-      RETURN_AS_TEXT
     }
+
+    return scan_text(lexer);
   }
 
 };
