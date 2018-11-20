@@ -1,0 +1,22 @@
+{
+  "author": "Benjamin Gray",
+  "main": "./index.js",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [],
+  "license": "MIT",
+  "name": "",
+  "dependencies": {
+    "nan": "^2.11.1"
+  },
+  "devDependencies": {
+    "tree-sitter-cli": "^0.13.10"
+  },
+  "scripts": {
+    "build": "tree-sitter generate && node-gyp build",
+    "test": "tree-sitter test"
+  }
+}

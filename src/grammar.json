@@ -1,0 +1,39 @@
+{
+  "name": "TODO",
+  "rules": {
+    "program": {
+      "type": "REPEAT",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "todo"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_text"
+          }
+        ]
+      }
+    }
+  },
+  "extras": [
+    {
+      "type": "PATTERN",
+      "value": "[^A-Z]+"
+    }
+  ],
+  "conflicts": [],
+  "externals": [
+    {
+      "type": "SYMBOL",
+      "name": "todo"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_text"
+    }
+  ],
+  "inline": []
+}
