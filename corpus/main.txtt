@@ -69,7 +69,7 @@ foo TODO
 =====
 Same line TODO
 =====
-foo TODO this TODO That
+fOo TODO this TODO That
 -----
 
 (program (todo (todo_token) (todo_body)))
