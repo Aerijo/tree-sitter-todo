@@ -7,6 +7,12 @@
 
 #include "tree_sitter/parser.h"
 
+#define RETURN_AS_TEXT \
+  lexer->advance(lexer, true); \
+  lexer->mark_end(lexer); \
+  lexer->result_symbol = TEXT; \
+  return true;
+
 
 namespace {
 
@@ -22,6 +28,7 @@ struct Scanner {
 
   bool ignore_case = false;
   bool get_entire_line = true;
+  bool require_word_boundary = true;
 
   bool require_delim = false; // TODO: support this
   char delim_character = '\0';
@@ -69,13 +76,14 @@ struct Scanner {
           name += toupper(lexer->lookahead);
           lexer->advance(lexer, false);
         } else {
-          lexer->advance(lexer, true);
-          lexer->mark_end(lexer);
-          lexer->result_symbol = TEXT;
-          return true;
+          RETURN_AS_TEXT
         }
       } else {
-        break;
+        if (!require_word_boundary || !(isdigit(lexer->lookahead) || lexer->lookahead == '_')) {
+          break;
+        } else {
+          RETURN_AS_TEXT
+        }
       }
     }
 
@@ -91,6 +99,10 @@ struct Scanner {
   }
 
   bool scan_todo_body(TSLexer *lexer) {
+    if (lexer->lookahead == '\n') {
+      RETURN_AS_TEXT
+    };
+
     while (lexer->lookahead && lexer->lookahead != '\n') {
       lexer->advance(lexer, false);
     }
@@ -101,12 +113,12 @@ struct Scanner {
   }
 
   bool scan_text(TSLexer *lexer) {
-    bool last_was_space = false;
+    bool next_can_be_todo = true;
 
     while (lexer->lookahead) {
-      if (last_was_space && isupper(lexer->lookahead)) break;
+      if (next_can_be_todo && isupper(lexer->lookahead)) break;
 
-      last_was_space = isspace(lexer->lookahead);
+      next_can_be_todo = !(isalnum(lexer->lookahead) || lexer->lookahead == '_');
       lexer->advance(lexer, true);
     }
 
@@ -128,10 +140,7 @@ struct Scanner {
     } else if (valid_symbols[TODO_TOKEN] && valid_symbols[TEXT]) {
       return scan_text(lexer);
     } else {
-      lexer->advance(lexer, true);
-      lexer->mark_end(lexer);
-      lexer->result_symbol = TEXT;
-      return true;
+      RETURN_AS_TEXT
     }
   }
 

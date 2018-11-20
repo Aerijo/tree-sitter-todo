@@ -73,3 +73,41 @@ fOo TODO this TODO That
 -----
 
 (program (todo (todo_token) (todo_body)))
+
+
+=====
+Valid initial characters TODO
+=====
+@TODO
+$TODO
+ TODO
+-TODO
+-----
+
+(program
+  (todo (todo_token))
+  (todo (todo_token))
+  (todo (todo_token))
+  (todo (todo_token)))
+
+
+=====
+Not valid initial characters TODO
+=====
+FTODO
+1TODO
+_TODO
+-----
+
+(program)
+
+
+=====
+Not valid trailing characters TODO
+=====
+TODOF
+TODO1
+TODO_
+-----
+
+(program)
