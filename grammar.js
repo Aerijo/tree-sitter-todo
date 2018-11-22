@@ -4,16 +4,14 @@ module.exports = grammar({
   externals: $ => [
     $.todo_token,
     $.todo_body,
-    $._text
-  ],
-
-  extras: $ => [
-    /[^A-Z]+/
+    $._other_text
   ],
 
   rules: {
     program: $ => repeat(choice($.todo, $._text)),
 
-    todo: $ => seq($.todo_token, optional($.todo_body))
+    todo: $ => prec(1, seq($.todo_token, optional($.todo_body))),
+
+    _text: $ => choice(/[^A-Z]+/, $._other_text)
   }
 })

@@ -7,28 +7,32 @@
 
 #define LANGUAGE_VERSION 9
 #define STATE_COUNT 7
-#define SYMBOL_COUNT 7
+#define SYMBOL_COUNT 9
 #define ALIAS_COUNT 0
-#define TOKEN_COUNT 4
+#define TOKEN_COUNT 5
 #define EXTERNAL_TOKEN_COUNT 3
 #define MAX_ALIAS_SEQUENCE_LENGTH 0
 
 enum {
   sym_todo_token = 1,
   sym_todo_body = 2,
-  sym__text = 3,
-  sym_program = 4,
-  sym_todo = 5,
-  aux_sym_program_repeat1 = 6,
+  sym__other_text = 3,
+  aux_sym_SLASH_LBRACK_CARETA_DASHZ_RBRACK_PLUS_SLASH = 4,
+  sym_program = 5,
+  sym_todo = 6,
+  sym__text = 7,
+  aux_sym_program_repeat1 = 8,
 };
 
 static const char *ts_symbol_names[] = {
   [sym_todo_token] = "todo_token",
   [sym_todo_body] = "todo_body",
-  [sym__text] = "_text",
+  [sym__other_text] = "_other_text",
   [ts_builtin_sym_end] = "END",
+  [aux_sym_SLASH_LBRACK_CARETA_DASHZ_RBRACK_PLUS_SLASH] = "/[^A-Z]+/",
   [sym_program] = "program",
   [sym_todo] = "todo",
+  [sym__text] = "_text",
   [aux_sym_program_repeat1] = "program_repeat1",
 };
 
@@ -41,7 +45,7 @@ static const TSSymbolMetadata ts_symbol_metadata[] = {
     .visible = true,
     .named = true,
   },
-  [sym__text] = {
+  [sym__other_text] = {
     .visible = false,
     .named = true,
   },
@@ -49,12 +53,20 @@ static const TSSymbolMetadata ts_symbol_metadata[] = {
     .visible = false,
     .named = true,
   },
+  [aux_sym_SLASH_LBRACK_CARETA_DASHZ_RBRACK_PLUS_SLASH] = {
+    .visible = false,
+    .named = false,
+  },
   [sym_program] = {
     .visible = true,
     .named = true,
   },
   [sym_todo] = {
     .visible = true,
+    .named = true,
+  },
+  [sym__text] = {
+    .visible = false,
     .named = true,
   },
   [aux_sym_program_repeat1] = {
@@ -69,11 +81,42 @@ static bool ts_lex(TSLexer *lexer, TSStateId state) {
     case 0:
       if (lookahead == 0)
         ADVANCE(1);
+      if (lookahead == '\t' ||
+          lookahead == '\n' ||
+          lookahead == '\r' ||
+          lookahead == ' ')
+        ADVANCE(2);
       if ((lookahead < 'A' || lookahead > 'Z'))
-        SKIP(0);
+        ADVANCE(3);
       END_STATE();
     case 1:
       ACCEPT_TOKEN(ts_builtin_sym_end);
+      END_STATE();
+    case 2:
+      ACCEPT_TOKEN(aux_sym_SLASH_LBRACK_CARETA_DASHZ_RBRACK_PLUS_SLASH);
+      if (lookahead == '\t' ||
+          lookahead == '\n' ||
+          lookahead == '\r' ||
+          lookahead == ' ')
+        ADVANCE(2);
+      if (lookahead != 0 &&
+          (lookahead < 'A' || lookahead > 'Z'))
+        ADVANCE(3);
+      END_STATE();
+    case 3:
+      ACCEPT_TOKEN(aux_sym_SLASH_LBRACK_CARETA_DASHZ_RBRACK_PLUS_SLASH);
+      if (lookahead != 0 &&
+          (lookahead < 'A' || lookahead > 'Z'))
+        ADVANCE(3);
+      END_STATE();
+    case 4:
+      if (lookahead == 0)
+        ADVANCE(1);
+      if (lookahead == '\t' ||
+          lookahead == '\n' ||
+          lookahead == '\r' ||
+          lookahead == ' ')
+        SKIP(4);
       END_STATE();
     default:
       return false;
@@ -84,7 +127,7 @@ static TSLexMode ts_lex_modes[STATE_COUNT] = {
   [0] = {.lex_state = 0, .external_lex_state = 1},
   [1] = {.lex_state = 0, .external_lex_state = 2},
   [2] = {.lex_state = 0, .external_lex_state = 1},
-  [3] = {.lex_state = 0},
+  [3] = {.lex_state = 4},
   [4] = {.lex_state = 0, .external_lex_state = 2},
   [5] = {.lex_state = 0, .external_lex_state = 2},
   [6] = {.lex_state = 0, .external_lex_state = 2},
@@ -93,24 +136,24 @@ static TSLexMode ts_lex_modes[STATE_COUNT] = {
 enum {
   ts_external_token_todo_token,
   ts_external_token_todo_body,
-  ts_external_token__text,
+  ts_external_token__other_text,
 };
 
 static TSSymbol ts_external_scanner_symbol_map[EXTERNAL_TOKEN_COUNT] = {
   [ts_external_token_todo_token] = sym_todo_token,
   [ts_external_token_todo_body] = sym_todo_body,
-  [ts_external_token__text] = sym__text,
+  [ts_external_token__other_text] = sym__other_text,
 };
 
 static bool ts_external_scanner_states[3][EXTERNAL_TOKEN_COUNT] = {
   [1] = {
     [ts_external_token_todo_token] = true,
     [ts_external_token_todo_body] = true,
-    [ts_external_token__text] = true,
+    [ts_external_token__other_text] = true,
   },
   [2] = {
     [ts_external_token_todo_token] = true,
-    [ts_external_token__text] = true,
+    [ts_external_token__other_text] = true,
   },
 };
 
@@ -118,44 +161,53 @@ static uint16_t ts_parse_table[STATE_COUNT][SYMBOL_COUNT] = {
   [0] = {
     [sym_todo_token] = ACTIONS(1),
     [sym_todo_body] = ACTIONS(1),
-    [sym__text] = ACTIONS(1),
+    [sym__other_text] = ACTIONS(1),
     [ts_builtin_sym_end] = ACTIONS(1),
+    [aux_sym_SLASH_LBRACK_CARETA_DASHZ_RBRACK_PLUS_SLASH] = ACTIONS(1),
   },
   [1] = {
     [sym_program] = STATE(3),
     [sym_todo] = STATE(4),
+    [sym__text] = STATE(4),
     [aux_sym_program_repeat1] = STATE(4),
     [sym_todo_token] = ACTIONS(3),
-    [sym__text] = ACTIONS(5),
+    [sym__other_text] = ACTIONS(5),
     [ts_builtin_sym_end] = ACTIONS(7),
+    [aux_sym_SLASH_LBRACK_CARETA_DASHZ_RBRACK_PLUS_SLASH] = ACTIONS(5),
   },
   [2] = {
     [sym_todo_token] = ACTIONS(9),
     [sym_todo_body] = ACTIONS(11),
-    [sym__text] = ACTIONS(9),
+    [sym__other_text] = ACTIONS(9),
     [ts_builtin_sym_end] = ACTIONS(9),
+    [aux_sym_SLASH_LBRACK_CARETA_DASHZ_RBRACK_PLUS_SLASH] = ACTIONS(9),
   },
   [3] = {
     [ts_builtin_sym_end] = ACTIONS(13),
   },
   [4] = {
     [sym_todo] = STATE(6),
+    [sym__text] = STATE(6),
     [aux_sym_program_repeat1] = STATE(6),
     [sym_todo_token] = ACTIONS(3),
-    [sym__text] = ACTIONS(15),
+    [sym__other_text] = ACTIONS(15),
     [ts_builtin_sym_end] = ACTIONS(17),
+    [aux_sym_SLASH_LBRACK_CARETA_DASHZ_RBRACK_PLUS_SLASH] = ACTIONS(15),
   },
   [5] = {
     [sym_todo_token] = ACTIONS(19),
-    [sym__text] = ACTIONS(19),
+    [sym__other_text] = ACTIONS(19),
     [ts_builtin_sym_end] = ACTIONS(19),
+    [aux_sym_SLASH_LBRACK_CARETA_DASHZ_RBRACK_PLUS_SLASH] = ACTIONS(19),
   },
   [6] = {
     [sym_todo] = STATE(6),
+    [sym__text] = STATE(6),
     [aux_sym_program_repeat1] = STATE(6),
     [sym_todo_token] = ACTIONS(21),
-    [sym__text] = ACTIONS(24),
+    [sym__other_text] = ACTIONS(24),
     [ts_builtin_sym_end] = ACTIONS(27),
+    [aux_sym_SLASH_LBRACK_CARETA_DASHZ_RBRACK_PLUS_SLASH] = ACTIONS(24),
   },
 };
 
